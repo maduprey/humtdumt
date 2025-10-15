@@ -2,7 +2,6 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import numpy as np
 import pandas as pd
-import torch.nn.functional as F
 import argparse
 from torch.nn.utils.rnn import pad_sequence
 import os
@@ -161,7 +160,7 @@ def main():
         "--save_path",
         type=str,
         default=None,
-        help=f"Output file to save results in. If not specified, will be saved into a new file.",
+        help="Output file to save results in. If not specified, will be saved into a new file.",
     )
 
     args = parser.parse_args()
@@ -170,7 +169,7 @@ def main():
 
     print(f"Processing file: {args.filename}")
     print(f"Input column: {args.input_column if args.input_column else 'None'}")
-    print(f"Selected metrics:")
+    print("Selected metrics:")
     for metric in args.metric:
         print(f"  {metric}")
 
@@ -181,7 +180,6 @@ def main():
         return
 
     filename = args.filename
-    fil = filename.split("/")[-1].split(".")[0]
     for metric in args.metric:
         print(f"Computing {metric} on {args.input_column} column in {filename}")
         df = calculate_td(df, args.input_column, metric)
