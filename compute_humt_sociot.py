@@ -64,7 +64,7 @@ def compute_set_log_sum_exp(inputs_batch):
     return torch.logsumexp(log_probs, dim=0).item()
 
 
-def compute_ci(prompt, candidates):
+def compute_mean(prompt, candidates):
     prompt = f'"{prompt}"' if prompt else ""
     input_batches = []
 
@@ -97,8 +97,7 @@ def compute_ci(prompt, candidates):
 
     # Process each batch
     mean_result = np.float64(compute_set_log_sum_exp(inputs_batch))
-    sem_result = np.float64(0.0)
-    return mean_result, sem_result
+    return mean_result
 
 
 def calculate_td(df, input_col, metric):
@@ -113,14 +112,12 @@ def calculate_td(df, input_col, metric):
 
     def compute_row(row):
         response = row[f"{input_col}_trunc"]
-        a_score, a_std = compute_ci(response, first_lex)
-        b_score, b_std = compute_ci(response, second_lex)
+        a_score = compute_mean(response, first_lex)
+        b_score = compute_mean(response, second_lex)
         log_ratio = a_score - b_score
-        return log_ratio, np.sqrt(a_std**2 + b_std**2)
+        return log_ratio
 
-    df[[f"{category}_{input_col}", f"std_{category}_{input_col}"]] = df.apply(
-        compute_row, axis=1, result_type="expand"
-    )
+    df[f"{category}_{input_col}"] = df.apply(compute_row, axis=1, result_type="expand")
     return df
 
 
