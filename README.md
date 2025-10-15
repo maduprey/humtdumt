@@ -47,7 +47,7 @@ See the paper for descriptions of each metric. We recommend running the code on 
 ## Example usage
 To compute HumT on the column `text` in `examples.csv`:
 
-`python compute_humt_sociot.py examples.csv --input_column text --metric humt`
+`python compute_humt_sociot.py examples.csv --input_column text --metric sociot_warmth`
 
 To compute HumT and SocioT on the column `text` in `examples.csv` and then save it to `all_metrics.csv`:
 

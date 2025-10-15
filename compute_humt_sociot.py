@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 import torch.nn.functional as F
 import argparse
-import scipy
 from torch.nn.utils.rnn import pad_sequence
 import os
 import sys
@@ -55,7 +54,7 @@ category_index = {
 tokenizer = AutoTokenizer.from_pretrained("gpt2")
 model = AutoModelForCausalLM.from_pretrained("gpt2")
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model.to(device).train()
+model.to(device).eval()
 
 
 def compute_set_log_sum_exp(inputs_batch):
@@ -66,7 +65,7 @@ def compute_set_log_sum_exp(inputs_batch):
     return torch.logsumexp(log_probs, dim=0).item()
 
 
-def compute_ci(prompt, candidates, n_samples=100):
+def compute_ci(prompt, candidates):
     prompt = f'"{prompt}"' if prompt else ""
     input_batches = []
 
@@ -97,14 +96,9 @@ def compute_ci(prompt, candidates, n_samples=100):
     # Combine inputs into a single batch
     inputs_batch = {"input_ids": input_ids, "attention_mask": attention_mask}
 
-    # Process each batch multiple times to collect results
-    results = []
-    for _ in range(n_samples):
-        # Concatenate all inputs into a single batch for vectorized processing
-        results.append(compute_set_log_sum_exp(inputs_batch))
-
-    mean_result = np.mean(results)
-    sem_result = scipy.stats.sem(results)
+    # Process each batch
+    mean_result = np.float64(compute_set_log_sum_exp(inputs_batch))
+    sem_result = np.float64(0.0)
     return mean_result, sem_result
 
 
