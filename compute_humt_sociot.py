@@ -42,17 +42,23 @@ category_terms = {
 
 # Dictionary of length of D+ phrase set for each dimension
 category_index = {
-    "sociot_warmth": 4,
-    "sociot_status": 3,
     "humt": 2,
-    "sociot_gender": 1,
+    "sociot_status": 3,
     "sociot_social_distance": 6,
+    "sociot_gender": 1,
+    "sociot_warmth": 4,
 }
 
 # Load the model and tokenizer
 tokenizer = AutoTokenizer.from_pretrained("gpt2")
 model = AutoModelForCausalLM.from_pretrained("gpt2")
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device(
+    "cuda"
+    if torch.cuda.is_available()
+    else "mps"
+    if torch.backends.mps.is_available()
+    else "cpu"
+)
 model.to(device).eval()
 
 
